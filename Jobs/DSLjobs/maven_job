@@ -1,0 +1,37 @@
+
+job('maven_dsl') {
+
+    description('Maven dsl project')
+        
+	
+	scm
+	{
+	git('https://github.com/debodevs/devops-maven.git', 'master', {node -> node / 'extensions' << '' })
+	}
+		        
+	steps{	        
+		maven { 
+			mavenInstallation('MAVEN_HOME')
+			goals('-B -DskipTests clean package')
+		}
+			
+		maven {
+			mavenInstallation('maven')
+			goals('test')
+		}
+		
+		
+		shell('''
+			echo ************RUNNING THE JAR************************
+			java -jar /opt/jenkins/workspace/maven_dsl/target/helloworld-0.0.1-SNAPSHOT.jar
+		      ''')
+ 
+}  
+
+	publishers {
+		archiveArtifacts('target/*.jar')
+		archiveJunit('target/surefire-reports/*.xml')																					  mailer('debajyotisarkar1198@gmail.com', true, true)
+
+    }	
+
+}
